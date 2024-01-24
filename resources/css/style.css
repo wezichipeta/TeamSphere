@@ -1,7 +1,11 @@
 .navbar-brand {
     width: 250px;
- }
+}
  
- .navbar-brand > img {
+.navbar-brand > img {
     width: 100%;
- }
+}
+
+.error {
+    color: #dc3545;
+}

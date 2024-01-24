@@ -21,3 +21,18 @@ function get_all_departments() {
     $conn = null;
     return $result;
 }
+
+function create_new_user(array $user_data) {
+// [
+//     'fullname' => 'Patty',
+//     'email' => 'pattyhsu.0815@gmail.com',
+//     'location' => 'Los Angeles, CA',
+//     'department' => 4,
+//     'birthday' => '08/01/1991',
+//     'password' => 'mysecretpassword',
+// ]
+    $conn = get_db_connection();
+    $stmt = $conn->prepare("INSERT INTO users (fullname, email, `location`, department, birthday, `password`) VALUES (:fullname, :email, :location, :department, :birthday, :password)");
+    $stmt->execute($user_data);
+    $conn = null;
+}
