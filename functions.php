@@ -21,3 +21,44 @@ function get_all_departments() {
     $conn = null;
     return $result;
 }
+
+function get_all_messages() {
+    $conn = get_db_connection();
+    $stmt = $conn->prepare("SELECT messages.id, messages.body, messages.sent_ts, users.fullname FROM messages left join users on messages.sent_by=users.id ORDER BY sent_ts DESC;");
+    $stmt->execute();
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $conn = null;
+    return $result;
+}
+
+function post_messsge(string $userEmail, string $userMessage): string {
+    if (strlen($userEmail) < 1) {
+        return 'User email required';
+    }
+    if (strlen($userMessage) < 1) {
+        return 'Message cannot be empty';
+    }
+
+    $conn = get_db_connection();
+    $stmt = $conn->prepare("SELECT users.id FROM users where email = :userEmail");
+    $stmt->bindParam('userEmail', $userEmail);
+    $stmt->execute();
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    /**
+    * @var int
+    */
+    if (!$result) {
+        $conn = null;
+        return 'Unknown user email';
+    }
+
+    $userId = current($result)['id'];
+    $timestamp = time();
+    $stmt = $conn->prepare("INSERT INTO messages (body, sent_ts, sent_by) VALUES (:userMessage, :sentTimestamp, :userId)");
+    $stmt->bindParam('userMessage', $userMessage);
+    $stmt->bindParam('sentTimestamp', $timestamp);
+    $stmt->bindParam('userId', $userId);
+    $stmt->execute();
+    $conn = null;
+    return 'Message posted!';
+}

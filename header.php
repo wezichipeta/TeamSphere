@@ -22,6 +22,12 @@
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="#">Home</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="./signup.php">Sign Up</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="./messages.php">Messages</a>
+                </li>
             </ul>
         </div>
     </div>
