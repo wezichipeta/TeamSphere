@@ -45,6 +45,10 @@
             ];
             
             create_new_user($user_data);
+            echo "<div class='alert alert-success'>";
+            echo "<p>Welcome to TeamSphere, {$user_data['fullname']}.</p>";
+            echo "</div>";
+
         }
         else {
             echo "<div class='alert alert-danger'>";
@@ -57,7 +61,8 @@
         }
     }
     ?>
-<div class="row">
+<?php if (!$_POST || count($errors)): ?>
+    <div class="row">
     <div class="col-md-6 offset-md-3 align-self-center mt-3">
         <h2>Sign Up</h2>
         <form action="signup.php" id="signup-form" method="post" enctype="multipart/form-data">
@@ -103,7 +108,8 @@
             <button type="submit" class="btn btn-primary">Sign Up</button>
         </form>
     </div>
-</div>
+    </div>
+<?php endif; ?>
 <script>
 $(function() {
     $("#signup-form").validate();
