@@ -13,3 +13,8 @@
 .error {
     color: #dc3545;
 }
+
+a.sign-in {
+    text-decoration: none;
+    color: #000;
+}

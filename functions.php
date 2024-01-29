@@ -70,3 +70,16 @@ function create_new_user(array $user_data) {
     $stmt->execute($user_data);
     $conn = null;
 }
+
+function authenticate_user($email, $password) {
+    $conn = get_db_connection();
+    $stmt = $conn->prepare("SELECT * FROM users WHERE email=:email AND `password`=:password LIMIT 1");
+    $user_data = [
+        'email' => $email,
+        'password' => $password
+    ];
+    $stmt->execute($user_data);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $conn = null;
+    return $result;
+}

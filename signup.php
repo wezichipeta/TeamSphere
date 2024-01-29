@@ -78,7 +78,8 @@
             </div>
             <div class="mb-3">
                 <label for="passwordInput" class="form-label">Password</label>
-                <input type="password" name="passwordInput" class="form-control" id="passwordInput" minlength="8" required>
+                <input type="password" name="passwordInput" class="form-control" id="passwordInput" aria-describedby="passwordInput" minlength="8" required>
+                <div id="passwordHelp" class="form-text">Your password should be at least 8 characters</div>
             </div>
             <div class="mb-3">
                 <label for="password2Input" class="form-label">Confirm Password</label>
