@@ -2,6 +2,10 @@
     width: 250px;
  }
  
- .navbar-brand > img {
-    width: 100%;
- }
+.navbar-brand > img {
+   width: 100%;
+}
+
+.main-body {
+   min-height: calc(100vh - 194px);
+}
