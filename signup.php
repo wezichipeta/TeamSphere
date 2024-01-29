@@ -8,11 +8,59 @@
         echo $e->getMessage();
         exit;
     }
+
+    if ($_POST) {
+        // If the form is submitted...
+        // Validate form data
+        $errors = [];
+        if (!$_POST['fullnameInput']) {
+            $errors[] = "Full name field is required";
+        }
+        if (!$_POST['birthdayInput']) {
+            $errors[] = "Birthday field is required";
+        }
+        if (!$_POST['emailInput']) {
+            $errors[] = "Email field is required";
+        }
+        if (!$_POST['locationInput']) {
+            $errors[] = "Location field is required";
+        }
+        if (!$_POST['department']) {
+            $errors[] = "Department field is required";
+        }
+        if (!$_POST['passwordInput']) {
+            $errors[] = "Password field is required";
+        }
+
+        if (count($errors) == 0) {
+            // Everything ok, create new user
+            $birthday= new DateTime( $_POST['birthdayInput']);
+            $user_data = [
+                'fullname' => $_POST['fullnameInput'],
+                'email' => $_POST['emailInput'],
+                'location' => $_POST['locationInput'],
+                'department' => $_POST['department'],
+                'birthday' => $birthday->format('Y-m-d'),
+                'password' => $_POST['passwordInput'],
+            ];
+            
+            create_new_user($user_data);
+        }
+        else {
+            echo "<div class='alert alert-danger'>";
+            echo "<ul>";
+            foreach ($errors as $current_error) {
+                echo "<li>{$current_error}</li>";
+            }
+            echo "</ul>";
+            echo "</div>";
+        }
+    }
     ?>
 <div class="row">
     <div class="col-md-6 offset-md-3 align-self-center mt-3">
         <h2>Sign Up</h2>
-        <form action="handle_signup.php" id="signup-form" method="post" enctype="multipart/form-data">
+        <form action="signup.php" id="signup-form" method="post" enctype="multipart/form-data">
             <div class="mb-3">
                 <label for="fullnameInput" class="form-label">Name</label>
                 <input type="text" name="fullnameInput" class="form-control" id="fullnameInput" aria-describedby="fullnameHelp" placeholder="Please enter your full name" required>
@@ -34,7 +82,7 @@
             <div class="mb-3">
                 <label for="department" class="form-label">Department</label>
                 <select class="form-select" name="department" aria-label="Department" id="department" required>
-                    <option selected>-- Select Department --</option>
+                    <option value="" selected>-- Select Department --</option>
                     <?php foreach ($departments as $current_department): ?>
                         <?= "<option value='{$current_department['id']}'>
                             {$current_department['departmentname']} ({$current_department['id']})
@@ -57,6 +105,32 @@
     </div>
 </div>
 <script>
+$(function() {
     $("#signup-form").validate();
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.coords.latitude},${position.coords.longitude}&key=`;
+
+            fetch(url)
+            .then((response) => response.json())
+            .then((data) => {
+                const city = data.results[0].address_components.find((component) =>
+                    component.types.includes("locality")
+                ).long_name;
+
+                const state = data.results[0].address_components.find((component) =>
+                    component.types.includes("administrative_area_level_1")
+                ).short_name;
+
+                $('input[name="locationInput"]').val(`${city}, ${state}`);
+            })
+            .catch((error) => console.log(error));
+        });
+    }
+    else {
+        console.log("Geolocation is not supported by this browser.");
+    }
+});
 </script>
 <?php require_once('footer.php'); ?>

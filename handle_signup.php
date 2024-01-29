@@ -3,6 +3,11 @@
 ?>
 
 <?php
+    // Validate form data
+    // if (!array_key_exists('fullnameInput', $_POST)) {
+        
+    // }
+
     $birthday= new DateTime( $_POST['birthdayInput']);
     $user_data = [
         'fullname' => $_POST['fullnameInput'],
