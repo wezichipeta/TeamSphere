@@ -22,15 +22,49 @@ function get_all_departments() {
     return $result;
 }
 
+function get_all_messages() {
+    $conn = get_db_connection();
+    $stmt = $conn->prepare("SELECT messages.id, messages.body, messages.sent_ts, users.fullname FROM messages left join users on messages.sent_by=users.id ORDER BY sent_ts DESC;");
+    $stmt->execute();
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $conn = null;
+    return $result;
+}
+
+function post_messsge(string $userEmail, string $userMessage): string {
+    if (strlen($userEmail) < 1) {
+        return 'User email required';
+    }
+    if (strlen($userMessage) < 1) {
+        return 'Message cannot be empty';
+    }
+
+    $conn = get_db_connection();
+    $stmt = $conn->prepare("SELECT users.id FROM users where email = :userEmail");
+    $stmt->bindParam('userEmail', $userEmail);
+    $stmt->execute();
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    /**
+    * @var int
+    */
+    if (!$result) {
+        $conn = null;
+        return 'Unknown user email';
+    }
+
+    $userId = current($result)['id'];
+    $timestamp = time();
+    $stmt = $conn->prepare("INSERT INTO messages (body, sent_ts, sent_by) VALUES (:userMessage, :sentTimestamp, :userId)");
+    $stmt->bindParam('userMessage', $userMessage);
+    $stmt->bindParam('sentTimestamp', $timestamp);
+    $stmt->bindParam('userId', $userId);
+    $stmt->execute();
+    $conn = null;
+    return 'Message posted!';
+}
+
+
 function create_new_user(array $user_data) {
-// [
-//     'fullname' => 'Patty',
-//     'email' => 'pattyhsu.0815@gmail.com',
-//     'location' => 'Los Angeles, CA',
-//     'department' => 4,
-//     'birthday' => '08/01/1991',
-//     'password' => 'mysecretpassword',
-// ]
     $conn = get_db_connection();
     $stmt = $conn->prepare("INSERT INTO users (fullname, email, `location`, department, birthday, `password`) VALUES (:fullname, :email, :location, :department, :birthday, :password)");
     $stmt->execute($user_data);

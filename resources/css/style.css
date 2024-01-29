@@ -3,7 +3,11 @@
 }
  
 .navbar-brand > img {
-    width: 100%;
+   width: 100%;
+}
+
+.main-body {
+   min-height: calc(100vh - 194px);
 }
 
 .error {
