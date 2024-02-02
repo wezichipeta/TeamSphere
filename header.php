@@ -34,6 +34,11 @@
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="./messages.php">Messages</a>
                 </li>
+                <!-- New Engagement Button -->
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="./engagement.php">Engagement</a>
+                </li>
+
             </ul>
             <?php if ($_SESSION && array_key_exists('user', $_SESSION) && $_SESSION['user']): ?>
                 <form class="form-inline my-2 my-lg-0">

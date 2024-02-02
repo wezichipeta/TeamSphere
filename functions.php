@@ -63,6 +63,50 @@ function post_messsge(string $userEmail, string $userMessage): string {
     return 'Message posted!';
 }
 
+// This portion contacins functions specifically for handling event-related operations. 
+//These functions will interact with your database to create, retrieve, and manage eventss
+//create_event: This function will handle the creation of a new event.
+function create_event($eventName, $eventDesc, $eventLocation, $eventDate, $createdBy) {
+    $conn = get_db_connection();
+    $stmt = $conn->prepare("INSERT INTO events (name, description, location, event_date, created_by) VALUES (:eventName, :eventDesc, :eventLocation, :eventDate, :createdBy)");
+    $stmt->bindParam(':eventName', $eventName);
+    $stmt->bindParam(':eventDesc', $eventDesc);
+    $stmt->bindParam(':eventLocation', $eventLocation);
+    $stmt->bindParam(':eventDate', $eventDate);
+    $stmt->bindParam(':createdBy', $createdBy);
+    $stmt->execute();
+    $conn = null;
+}
+//get_all_events: Retrieves a list of all upcoming events.
+function get_all_events() {
+    $conn = get_db_connection();
+    $stmt = $conn->prepare("SELECT * FROM events WHERE event_date >= CURDATE() ORDER BY event_date");
+    $stmt->execute();
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $conn = null;
+    return $result;
+}
+
+// join_event: Allows a user to join an event.
+function join_event($userId, $eventId) {
+    $conn = get_db_connection();
+    $stmt = $conn->prepare("INSERT INTO event_participants (user_id, event_id) VALUES (:userId, :eventId)");
+    $stmt->bindParam(':userId', $userId);
+    $stmt->bindParam(':eventId', $eventId);
+    $stmt->execute();
+    $conn = null;
+}
+
+//get_event_details: Retrieves details for a specific event.
+function get_event_details($eventId) {
+    $conn = get_db_connection();
+    $stmt = $conn->prepare("SELECT * FROM events WHERE id = :eventId");
+    $stmt->bindParam(':eventId', $eventId);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $conn = null;
+    return $result;
+}
 
 function create_new_user(array $user_data) {
     $conn = get_db_connection();
@@ -83,3 +127,4 @@ function authenticate_user($email, $password) {
     $conn = null;
     return $result;
 }
+
