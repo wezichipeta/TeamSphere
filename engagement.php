@@ -1,15 +1,11 @@
-
 <?php
 require_once('header.php');
-require_once('config.php'); // Make sure this file exists and correctly sets up the database connection
-require_once('functions.php'); // This should contain your event-related functions
 
 // User authentication check
-session_start();
-if (!isset($_SESSION['user_id'])) {
-   header('Location: login.php'); // Redirect to login page if not authenticated
-    exit();
-}
+// if (!isset($_SESSION['user_id'])) {
+//    header('Location: login.php'); // Redirect to login page if not authenticated
+//     exit();
+// }
 
 // Handle event creation form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['createEvent'])) {

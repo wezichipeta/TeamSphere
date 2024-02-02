@@ -11,7 +11,7 @@
 
     if ($_POST) {
         // If the form is submitted...
-        // Validate form data
+        // Validate form data from PHP
         $errors = [];
         if (!$_POST['fullnameInput']) {
             $errors[] = "Full name field is required";
@@ -33,7 +33,7 @@
         }
 
         if (count($errors) == 0) {
-            // Everything ok, create new user
+            // Everything ok, create new user in right format
             $birthday= new DateTime( $_POST['birthdayInput']);
             $user_data = [
                 'fullname' => $_POST['fullnameInput'],
@@ -61,7 +61,7 @@
         }
     }
     ?>
-<?php if (!$_POST || count($errors)): ?>
+<?php if (!$_POST || count($errors)): // Show sign up form?> 
     <div class="row">
     <div class="col-md-6 offset-md-3 align-self-center mt-3">
         <h2>Sign Up</h2>
