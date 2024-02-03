@@ -38,6 +38,10 @@
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="./engagement.php">Engagement</a>
                 </li>
+                <!-- New Community Button -->
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="./community.php">Community</a>
+                </li>
 
             </ul>
             <?php if ($_SESSION && array_key_exists('user', $_SESSION) && $_SESSION['user']): ?>
