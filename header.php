@@ -42,6 +42,10 @@
                 <li class="nav-item">
                     <a class="nav-link" aria-current="page" href="">Task Board</a>
                 </li>
+                <!-- New Community Button -->
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="./community.php">Community</a>
+                </li>
             </ul>
             <?php if (is_user_logged_in()): ?>
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0 profile-menu"> 
