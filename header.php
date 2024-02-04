@@ -44,7 +44,7 @@
                 </li>
                 <!-- New Community Button -->
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="./community.php">Community</a>
+                    <a class="nav-link" aria-current="page" href="./community.php">Community</a>
                 </li>
             </ul>
             <?php if (is_user_logged_in()): ?>
