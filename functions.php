@@ -117,7 +117,7 @@ function create_new_user(array $user_data) {
 
 function authenticate_user($email, $password) {
     $conn = get_db_connection();
-    $stmt = $conn->prepare("SELECT * FROM users WHERE email=:email AND `password`=:password LIMIT 1");
+    $stmt = $conn->prepare("SELECT * FROM users u LEFT JOIN departments d ON u.department=d.id WHERE email=:email AND `password`=:password LIMIT 1");
     $user_data = [
         'email' => $email,
         'password' => $password
@@ -128,3 +128,6 @@ function authenticate_user($email, $password) {
     return $result;
 }
 
+function is_user_logged_in() {
+    return $_SESSION && array_key_exists('user', $_SESSION) && $_SESSION['user'];
+}

@@ -1,6 +1,5 @@
 <?php
     require_once('header.php');
-    
 
     if ($_POST) {
         // If the form is submitted...
@@ -43,7 +42,11 @@
                 <input type="password" name="passwordInput" class="form-control" id="passwordInput" minlength="8" required>
             </div>
             <button type="submit" class="btn btn-primary">Sign In</button>
+            <div class="text-center">
+                <p>Not a member? <a href="./signup.php">Register</a></p>
+            </div>
         </form>
+
     </div>
 </div>
 <script>
