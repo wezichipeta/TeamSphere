@@ -73,7 +73,7 @@ function create_event($eventName, $eventDesc, $eventLocation, $eventDate, $creat
     $stmt->bindParam(':eventDesc', $eventDesc);
     $stmt->bindParam(':eventLocation', $eventLocation);
     $stmt->bindParam(':eventDate', $eventDate);
-    $stmt->bindParam(':createdBy', $createdBy);
+    $stmt->bindParam(':createdBy', $createdBy['id']);
     $stmt->execute();
     $conn = null;
 }
@@ -90,10 +90,21 @@ function get_all_events() {
 // join_event: Allows a user to join an event.
 function join_event($userId, $eventId) {
     $conn = get_db_connection();
-    $stmt = $conn->prepare("INSERT INTO event_participants (user_id, event_id) VALUES (:userId, :eventId)");
+    
+    // Check if the user is already participating in the event
+    $stmt = $conn->prepare("SELECT * FROM event_participants WHERE user_id = :userId AND event_id = :eventId");
     $stmt->bindParam(':userId', $userId);
     $stmt->bindParam(':eventId', $eventId);
     $stmt->execute();
+    
+    if ($stmt->rowCount() == 0) {
+        // If the user is not already participating, insert a new record
+        $stmt = $conn->prepare("INSERT INTO event_participants (user_id, event_id) VALUES (:userId, :eventId)");
+        $stmt->bindParam(':userId', $userId);
+        $stmt->bindParam(':eventId', $eventId);
+        $stmt->execute();
+    }
+    
     $conn = null;
 }
 
