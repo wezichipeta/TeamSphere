@@ -31,31 +31,28 @@ function get_all_public_messages() {
     return $result;
 }
 
-function post_messsge(string $userEmail, string $userMessage, bool $isPublic): string {
-    if (strlen($userEmail) < 1) {
-        return 'User email required';
+function post_messsge(string $userMessage, bool $isPublic, ?int $chatId): string {
+    if (!is_user_logged_in()) {
+        return 'Login required';
     }
     if (strlen($userMessage) < 1) {
         return 'Message cannot be empty';
     }
-
+    $userId = $_SESSION['user']['user_id'];
     $conn = get_db_connection();
-    $stmt = $conn->prepare("SELECT users.id FROM users where email = :userEmail");
-    $stmt->bindParam('userEmail', $userEmail);
-    $stmt->execute();
-    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    /**
-    * @var int
-    */
-    if (!$result) {
-        $conn = null;
-        return 'Unknown user email';
-    }
-
-    $userId = current($result)['id'];
     $timestamp = time();
-    $chatId = null;
-    $isPublic = true;
+
+    if (!$isPublic) {
+        $stmt = $conn->prepare("SELECT chat_id FROM chat_users WHERE chat_id=:chatId and user_id=:currentUserId;");
+        $stmt->bindParam('chatId', $chatId);
+        $stmt->bindParam('currentUserId', $userId);
+        $stmt->execute();
+        $chatUsers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if (!count($chatUsers)) {
+            return "You don't have access to this chat";
+        };
+    }
+    
     $stmt = $conn->prepare("INSERT INTO messages (body, sent_ts, sent_by, chat_id, is_public) VALUES (:userMessage, :sentTimestamp, :userId, :chatId, :isPublic)");
     $stmt->bindParam('userMessage', $userMessage);
     $stmt->bindParam('sentTimestamp', $timestamp);
@@ -69,15 +66,18 @@ function post_messsge(string $userEmail, string $userMessage, bool $isPublic): s
 
 function get_all_chats() {
     $conn = get_db_connection();
-    $currentUserId = $_SESSION['user']['user_id'];
-    if (!$currentUserId) {
+    if (!is_user_logged_in()) {
         return [];
     }
+    $currentUserId = $_SESSION['user']['user_id'];
     $stmt = $conn->prepare("SELECT chats.id, chats.name FROM chats left join chat_users on chat_users.chat_id=chats.id left join users on users.id=chat_users.user_id where users.id=:userId;");
     $stmt->bindParam('userId', $currentUserId);
     $stmt->execute();
     $chats = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $chatIds = [];
+    if (!count($chats)) {
+        return [];
+    }
     foreach ($chats as $chat) {
         $chatIds[] = $chat['id'];
     }
@@ -95,6 +95,36 @@ function get_all_chats() {
         $chat['name'] = 'Chat with ' . $chatIdToUserName[$chat['id']][0];
     }
     return $chats;
+}
+
+function get_messages_by_chat_id($chatId) {
+    $conn = get_db_connection();
+    if (!is_user_logged_in()) {
+        return [];
+    }
+    $currentUserId = $_SESSION['user']['user_id'];
+    $stmt = $conn->prepare("SELECT messages.body, users.fullname, messages.sent_by, chat_users.user_id FROM messages left join chat_users on chat_users.chat_id = messages.chat_id left join users on chat_users.user_id = users.id where chat_users.user_id=:currentUserId and chat_users.chat_id=:chatId ORDER BY messages.sent_ts DESC;");
+    $stmt->bindParam('chatId', $chatId);
+    $stmt->bindParam('currentUserId', $currentUserId);
+    $stmt->execute();
+    $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $conn = null;
+    return $messages;
+}
+
+// Assume everyone is friend until friend functionality is implemented
+function get_friend_users() {
+    $conn = get_db_connection();
+    $currentUserId = $_SESSION['user']['user_id'];
+    if (!$currentUserId) {
+        return [];
+    }
+    $stmt = $conn->prepare("SELECT users.id, users.fullname, users.email FROM users WHERE users.id!=:currentUserId;");
+    $stmt->bindParam('currentUserId', $currentUserId);
+    $stmt->execute();
+    $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $conn = null;
+    return $users;
 }
 
 // This portion contacins functions specifically for handling event-related operations. 

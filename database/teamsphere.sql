@@ -98,6 +98,11 @@ COMMIT;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 
 -- Messages
+CREATE TABLE chats (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name varchar(255)
+);
+
 CREATE TABLE `messages` (
   `id` int NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (id),
@@ -109,11 +114,6 @@ CREATE TABLE `messages` (
   FOREIGN KEY (chat_id) REFERENCES chats(id),
   FOREIGN KEY (sent_by) REFERENCES users(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-CREATE TABLE chats (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  name varchar(255)
-);
 
 CREATE TABLE chat_users (
   chat_id INT NOT NULL,
