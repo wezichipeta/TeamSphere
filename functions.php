@@ -22,16 +22,16 @@ function get_all_departments() {
     return $result;
 }
 
-function get_all_messages() {
+function get_all_public_messages() {
     $conn = get_db_connection();
-    $stmt = $conn->prepare("SELECT messages.id, messages.body, messages.sent_ts, users.fullname FROM messages left join users on messages.sent_by=users.id ORDER BY sent_ts DESC;");
+    $stmt = $conn->prepare("SELECT messages.id, messages.body, messages.sent_ts, users.fullname FROM messages left join users on messages.sent_by=users.id WHERE is_public = 1 ORDER BY sent_ts DESC;");
     $stmt->execute();
     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $conn = null;
     return $result;
 }
 
-function post_messsge(string $userEmail, string $userMessage): string {
+function post_messsge(string $userEmail, string $userMessage, bool $isPublic): string {
     if (strlen($userEmail) < 1) {
         return 'User email required';
     }
@@ -54,13 +54,47 @@ function post_messsge(string $userEmail, string $userMessage): string {
 
     $userId = current($result)['id'];
     $timestamp = time();
-    $stmt = $conn->prepare("INSERT INTO messages (body, sent_ts, sent_by) VALUES (:userMessage, :sentTimestamp, :userId)");
+    $chatId = null;
+    $isPublic = true;
+    $stmt = $conn->prepare("INSERT INTO messages (body, sent_ts, sent_by, chat_id, is_public) VALUES (:userMessage, :sentTimestamp, :userId, :chatId, :isPublic)");
     $stmt->bindParam('userMessage', $userMessage);
     $stmt->bindParam('sentTimestamp', $timestamp);
     $stmt->bindParam('userId', $userId);
+    $stmt->bindParam('chatId', $chatId);
+    $stmt->bindParam('isPublic', $isPublic);
     $stmt->execute();
     $conn = null;
     return 'Message posted!';
+}
+
+function get_all_chats() {
+    $conn = get_db_connection();
+    $currentUserId = $_SESSION['user']['user_id'];
+    if (!$currentUserId) {
+        return [];
+    }
+    $stmt = $conn->prepare("SELECT chats.id, chats.name FROM chats left join chat_users on chat_users.chat_id=chats.id left join users on users.id=chat_users.user_id where users.id=:userId;");
+    $stmt->bindParam('userId', $currentUserId);
+    $stmt->execute();
+    $chats = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $chatIds = [];
+    foreach ($chats as $chat) {
+        $chatIds[] = $chat['id'];
+    }
+    $conn = get_db_connection();
+    $stmt = $conn->prepare("SELECT DISTINCT chat_users.chat_id, users.fullname FROM users left join chat_users on chat_users.user_id = users.id where chat_users.chat_id in (" . implode(',', $chatIds) . ") and users.id != :currentUserId;");
+    $stmt->bindParam('currentUserId', $currentUserId);
+    $stmt->execute();
+    $users = $stmt->fetchAll();
+    $conn = null;
+    $chatIdToUserName = array();
+    foreach ($users as $user) {
+        $chatIdToUserName[$user['chat_id']][] = $user['fullname'];
+    }
+    foreach ($chats as &$chat) {
+        $chat['name'] = 'Chat with ' . $chatIdToUserName[$chat['id']][0];
+    }
+    return $chats;
 }
 
 // This portion contacins functions specifically for handling event-related operations. 
@@ -128,7 +162,7 @@ function create_new_user(array $user_data) {
 
 function authenticate_user($email, $password) {
     $conn = get_db_connection();
-    $stmt = $conn->prepare("SELECT * FROM users u LEFT JOIN departments d ON u.department=d.id WHERE email=:email AND `password`=:password LIMIT 1");
+    $stmt = $conn->prepare("SELECT u.id as user_id, u.fullname, u.email, u.location, u.birthday, d.departmentname FROM users u LEFT JOIN departments d ON u.department=d.id WHERE email=:email AND `password`=:password LIMIT 1");
     $user_data = [
         'email' => $email,
         'password' => $password

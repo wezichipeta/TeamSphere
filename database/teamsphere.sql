@@ -103,9 +103,25 @@ CREATE TABLE `messages` (
   PRIMARY KEY (id),
   `body` TEXT NOT NULL,
   `sent_ts` int NOT NULL,
-  `sent_by`int,
+  `sent_by`int NOT NULL,
+  chat_id int,
+  is_public boolean NOT NULL,
+  FOREIGN KEY (chat_id) REFERENCES chats(id),
   FOREIGN KEY (sent_by) REFERENCES users(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE chats (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name varchar(255)
+);
+
+CREATE TABLE chat_users (
+  chat_id INT NOT NULL,
+  user_id INT NOT NULL,
+  PRIMARY KEY (chat_id, user_id),
+  FOREIGN KEY (chat_id) REFERENCES chats(id),
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
 
 
 /*SQL to Create events Table:This table will store details about each event. */

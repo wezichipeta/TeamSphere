@@ -4,7 +4,9 @@
 
 <div class='main-body'>
     <?php
-        $message = post_messsge($_POST['userEmailInput'], $_POST['messageBodyInput']);
+        error_reporting(E_ALL);
+        ini_set('display_errors', 'On');
+        $message = post_messsge($_SESSION['user']['email'], $_POST['messageBodyInput'], True);
     ?>
     <h3><?=$message?></h3>
     </pre>
