@@ -122,7 +122,7 @@ CREATE TABLE chat_users (
   FOREIGN KEY (chat_id) REFERENCES chats(id),
   FOREIGN KEY (user_id) REFERENCES users(id)
 );
-
+-- Messages end
 
 /*SQL to Create events Table:This table will store details about each event. */
 
@@ -149,6 +149,3 @@ CREATE TABLE `event_participants` (
   FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
   FOREIGN KEY (`event_id`) REFERENCES `events`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-
--- Messages end

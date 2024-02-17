@@ -4,9 +4,8 @@
 
 <div class='main-body'>
     <?php
-        error_reporting(E_ALL);
-        ini_set('display_errors', 'On');
-        print_r($_POST)
+        $response = create_chat($_POST['userId']);
+        echo $response;
     ?>
 </div>
 

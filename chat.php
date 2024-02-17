@@ -3,9 +3,8 @@
 ?>
 
 <div class='main-body container'>
+    <a href='messages.php'>&lt;Back to messages</a>
     <?php
-        error_reporting(E_ALL);
-        ini_set('display_errors', 'On');
         $messages = [];
         $queryParameters = array();
         parse_str($_SERVER['QUERY_STRING'], $queryParameters);

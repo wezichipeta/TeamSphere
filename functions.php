@@ -31,7 +31,7 @@ function get_all_public_messages() {
     return $result;
 }
 
-function post_messsge(string $userMessage, bool $isPublic, ?int $chatId): string {
+function post_messsge(string $userMessage, int $isPublic, ?int $chatId): string {
     if (!is_user_logged_in()) {
         return 'Login required';
     }
@@ -89,10 +89,14 @@ function get_all_chats() {
     $conn = null;
     $chatIdToUserName = array();
     foreach ($users as $user) {
-        $chatIdToUserName[$user['chat_id']][] = $user['fullname'];
+        $chatIdToUserName[$user['chat_id']][] = [
+            'fullname' => $user['fullname'],
+            'user_id' => $user['id']
+        ];
     }
     foreach ($chats as &$chat) {
-        $chat['name'] = 'Chat with ' . $chatIdToUserName[$chat['id']][0];
+        $chat['name'] = 'Chat with ' . $chatIdToUserName[$chat['id']][0]['fullname'];
+        $chat['other_user_id'] = $chatIdToUserName[$chat['id']][0]['user_id'];
     }
     return $chats;
 }
@@ -103,13 +107,47 @@ function get_messages_by_chat_id($chatId) {
         return [];
     }
     $currentUserId = $_SESSION['user']['user_id'];
-    $stmt = $conn->prepare("SELECT messages.body, users.fullname, messages.sent_by, chat_users.user_id FROM messages left join chat_users on chat_users.chat_id = messages.chat_id left join users on chat_users.user_id = users.id where chat_users.user_id=:currentUserId and chat_users.chat_id=:chatId ORDER BY messages.sent_ts DESC;");
+    $stmt = $conn->prepare("SELECT messages.body, users.fullname, messages.sent_by, chat_users.user_id FROM messages left join chat_users on chat_users.chat_id = messages.chat_id left join users on messages.sent_by = users.id where chat_users.user_id=:currentUserId and chat_users.chat_id=:chatId ORDER BY messages.sent_ts DESC;");
     $stmt->bindParam('chatId', $chatId);
     $stmt->bindParam('currentUserId', $currentUserId);
     $stmt->execute();
     $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $conn = null;
     return $messages;
+}
+
+function create_chat(int $otherUserId) {
+    if (!is_user_logged_in()) {
+        return 'Login required';
+    }
+    $conn = get_db_connection();
+    $currentUserId = $_SESSION['user']['user_id'];
+    $stmt = $conn->prepare("SELECT chat_users.chat_id FROM chat_users WHERE chat_users.user_id=:currentUserId and chat_users.chat_id IN (
+        SELECT chat_users.chat_id FROM chat_users WHERE chat_users.user_id=:otherUserId
+    );");
+    $stmt->bindParam('currentUserId', $currentUserId);
+    $stmt->bindParam('otherUserId', $otherUserId);
+    $stmt->execute();
+    $existingChats = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    if (count($existingChats)) {
+        $existingChatId = $existingChats[0]["chat_id"];
+        return 'Please use exsiting <a href="chat.php?chat_id=' . $existingChatId . '">Chat</a>';
+    }
+
+    // Create new chat
+    $stmt = $conn->prepare("INSERT INTO chats VALUES ()");
+    $stmt->execute();
+    $newChatId = $conn->lastInsertId();
+    // Create new user chat association
+    $stmt = $conn->prepare("INSERT INTO chat_users (user_id, chat_id) VALUES (:currentUserId,:newChatId), (:otherUserId, :newChatId)");
+    $stmt->bindParam('currentUserId', $currentUserId);
+    $stmt->bindParam('newChatId', $newChatId);
+    $stmt->bindParam('otherUserId', $otherUserId);
+    $stmt->execute();
+    // Create first message
+    post_messsge('I just created a new chat!', 0, $newChatId);
+    $conn = null;
+    return 'New chat created: <a href="chat.php?chat_id=' . $newChatId . '">Go to new chat</a>';
 }
 
 // Assume everyone is friend until friend functionality is implemented

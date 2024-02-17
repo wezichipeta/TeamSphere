@@ -9,9 +9,9 @@
         parse_str($_SERVER['QUERY_STRING'], $queryParameters);
         $isPublicChat = $queryParameters['is_public'] == 'true';
         if ($isPublicChat) {
-            $result = post_messsge($_POST['messageBodyInput'], true, null);
+            $result = post_messsge($_POST['messageBodyInput'], 1, null);
         } else {
-            $result = post_messsge($_POST['messageBodyInput'], true, $queryParameters['chat_id']);
+            $result = post_messsge($_POST['messageBodyInput'], 0, $queryParameters['chat_id']);
         }
     ?>
     <?php if($isPublicChat) {?>
@@ -21,7 +21,7 @@
     <?php } else {?>
         <h3><?=$result?></h3>
         </pre>
-        <a href="chat.php?chat_id=<?=$queryParameters['chat_id']?>">Go back to messages</a>
+        <a href="chat.php?chat_id=<?=$queryParameters['chat_id']?>">Go back to chat</a>
     <?php }?>
     
 </div>
