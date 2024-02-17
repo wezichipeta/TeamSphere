@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['joinEvent'])) {
     $eventId = $_POST['eventId'];
     $userId = $_SESSION['user'];
 
-    $userId = $_SESSION['user']['id']; // Assuming 'user_id' is the key for the user ID in the session array
+    $userId = $_SESSION['user']['user_id']; // Assuming 'user_id' is the key for the user ID in the session array
 
     join_event($userId, $eventId); // Function to join an event
 }
