@@ -33,7 +33,7 @@
         <ul class="list-group">
             <?php foreach($messages as $message): ?>
                 <li class="list-group-item">
-                    <div>
+                    <div class="<?=$message['sent_by'] == $_SESSION['user']['user_id'] ? 'text-end' : ''?>">
                         <?=$message['fullname']?>: <?=$message['body']?>
                     </div>
                 </li>

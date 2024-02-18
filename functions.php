@@ -24,7 +24,7 @@ function get_all_departments() {
 
 function get_all_public_messages() {
     $conn = get_db_connection();
-    $stmt = $conn->prepare("SELECT messages.id, messages.body, messages.sent_ts, users.fullname FROM messages left join users on messages.sent_by=users.id WHERE is_public = 1 ORDER BY sent_ts DESC;");
+    $stmt = $conn->prepare("SELECT messages.id, messages.body, messages.sent_ts, messages.sent_by, users.fullname FROM messages left join users on messages.sent_by=users.id WHERE is_public = 1 ORDER BY sent_ts DESC;");
     $stmt->execute();
     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $conn = null;
