@@ -1,6 +1,6 @@
 <?php
 require_once('header.php');
-session_start(); // Start the session to track likes
+// session_start(); // Start the session to track likes
 
 // Initialize likes in session if not already set
 if (!isset($_SESSION['likes'])) {
@@ -31,7 +31,6 @@ $posts = [
         'content' => 'Combining PHP and MySQL gives you the ability to create complex websites with dynamic and interactive content.',
         'details' => 'Database Administrator with a passion for SQL databases and performance optimization.',
     ],
-    // Added more posts
     [
         'author' => 'Alice Johnson',
         'title' => 'The Basics of Web Security',
@@ -100,7 +99,7 @@ $posts = [
         <?php foreach ($posts as $index => $post): ?>
             <div class="post">
                 <h3><?= htmlspecialchars($post['title']) ?></h3>
-                <p><strong>Posted by:</strong> <?= htmlspecialchars($post['author']) ?></p>
+                <p><strong>Posted by:</strong> <span title="<?= htmlspecialchars($post['details']) ?>"><?= htmlspecialchars($post['author']) ?></span></p>
                 <p><?= htmlspecialchars($post['content']) ?></p>
                 <p><strong>Likes:</strong> <?= $_SESSION['likes'][$index] ?> 
                 <form method="post" action="" class="like-form">
