@@ -31,7 +31,7 @@ function get_all_public_messages() {
     return $result;
 }
 
-function post_messsge(string $userMessage, int $isPublic, ?int $chatId): string {
+function post_message(string $userMessage, int $isPublic, ?int $chatId): string {
     if (!is_user_logged_in()) {
         return 'Login required';
     }
@@ -175,7 +175,7 @@ function create_event($eventName, $eventDesc, $eventLocation, $eventDate, $creat
     $stmt->bindParam(':eventDesc', $eventDesc);
     $stmt->bindParam(':eventLocation', $eventLocation);
     $stmt->bindParam(':eventDate', $eventDate);
-    $stmt->bindParam(':createdBy', $createdBy['id']);
+    $stmt->bindParam(':createdBy', $createdBy['user_id']);
     $stmt->execute();
     $conn = null;
 }
@@ -220,6 +220,34 @@ function get_event_details($eventId) {
     $conn = null;
     return $result;
 }
+
+//Function to Retrieve User-Joined Events
+
+function get_user_joined_events($userId) {
+    $conn = get_db_connection();
+    $stmt = $conn->prepare("
+        SELECT e.* FROM events e
+        INNER JOIN event_participants ep ON e.id = ep.event_id
+        WHERE ep.user_id = :userId AND e.event_date >= CURDATE()
+        ORDER BY e.event_date ASC
+    ");
+    $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function leave_event($userId, $eventId) {
+    error_log("leave_event called with userId: $userId and eventId: $eventId"); // This will log to the server's error log.
+    
+
+    $conn = get_db_connection();
+    $stmt = $conn->prepare("DELETE FROM event_participants WHERE user_id = :userId AND event_id = :eventId");
+    $stmt->bindParam(':userId', $userId);
+    $stmt->bindParam(':eventId', $eventId);
+    $stmt->execute();
+    $conn = null;
+}
+
 
 function create_new_user(array $user_data) {
     $conn = get_db_connection();
