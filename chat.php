@@ -30,15 +30,21 @@
     </form>
 
     <div style="margin: 30px auto;">
-        <ul class="list-group">
+        <div class="box-footer box-comments" style="display: block;">
             <?php foreach($messages as $message): ?>
-                <li class="list-group-item">
-                    <div class="<?=$message['sent_by'] == $_SESSION['user']['user_id'] ? 'text-end' : ''?>">
-                        <?=$message['fullname']?>: <?=$message['body']?>
+                <div class="box-comment">
+                    <div class="<?=is_user_logged_in() && $message['sent_by'] == $_SESSION['user']['user_id'] ? 'text-end' : ''?>">
+                        <span class="username">
+                            <?=$message['fullname']?>
+                            <span class="text-muted pull-right">
+                                <?=timestamp_to_datetime($message['sent_ts'])?>
+                            </span>
+                        </span>
+                            <?=$message['body']?>
                     </div>
-                </li>
-            <?php endforeach;?>
-        </ul>
+                </div>
+            <?php endforeach; ?>
+        </div>
     </div>
 </div>
 

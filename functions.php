@@ -22,9 +22,18 @@ function get_all_departments() {
     return $result;
 }
 
+function timestamp_to_datetime(int $timestamp): string {
+    $timezone = "America/Los_Angeles";
+    $dt = new DateTime();
+    $dt->setTimestamp($timestamp);
+    $dt->setTimezone(new DateTimeZone($timezone));
+    $datetime = $dt->format('Y-m-d H:i:s a T');
+    return $datetime;
+}
+
 function get_all_public_messages() {
     $conn = get_db_connection();
-    $stmt = $conn->prepare("SELECT messages.id, messages.body, messages.sent_ts, messages.sent_by, users.fullname FROM messages left join users on messages.sent_by=users.id WHERE is_public = 1 ORDER BY sent_ts DESC;");
+    $stmt = $conn->prepare("SELECT messages.id, messages.body, messages.sent_ts, messages.sent_by, users.fullname FROM messages left join users on messages.sent_by=users.id WHERE is_public = 1 ORDER BY sent_ts ASC;");
     $stmt->execute();
     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $conn = null;
@@ -107,7 +116,7 @@ function get_messages_by_chat_id($chatId) {
         return [];
     }
     $currentUserId = $_SESSION['user']['user_id'];
-    $stmt = $conn->prepare("SELECT messages.body, users.fullname, messages.sent_by, chat_users.user_id FROM messages left join chat_users on chat_users.chat_id = messages.chat_id left join users on messages.sent_by = users.id where chat_users.user_id=:currentUserId and chat_users.chat_id=:chatId ORDER BY messages.sent_ts DESC;");
+    $stmt = $conn->prepare("SELECT messages.body, users.fullname, messages.sent_by, messages.sent_ts, chat_users.user_id FROM messages left join chat_users on chat_users.chat_id = messages.chat_id left join users on messages.sent_by = users.id where chat_users.user_id=:currentUserId and chat_users.chat_id=:chatId ORDER BY messages.sent_ts ASC;");
     $stmt->bindParam('chatId', $chatId);
     $stmt->bindParam('currentUserId', $currentUserId);
     $stmt->execute();
@@ -145,7 +154,7 @@ function create_chat(int $otherUserId) {
     $stmt->bindParam('otherUserId', $otherUserId);
     $stmt->execute();
     // Create first message
-    post_messsge('I just created a new chat!', 0, $newChatId);
+    post_message('I just created a new chat!', 0, $newChatId);
     $conn = null;
     return 'New chat created: <a href="chat.php?chat_id=' . $newChatId . '">Go to new chat</a>';
 }

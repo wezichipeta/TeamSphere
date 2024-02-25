@@ -9,9 +9,9 @@
         parse_str($_SERVER['QUERY_STRING'], $queryParameters);
         $isPublicChat = $queryParameters['is_public'] == 'true';
         if ($isPublicChat) {
-            $result = post_messsge($_POST['messageBodyInput'], 1, null);
+            $result = post_message($_POST['messageBodyInput'], 1, null);
         } else {
-            $result = post_messsge($_POST['messageBodyInput'], 0, $queryParameters['chat_id']);
+            $result = post_message($_POST['messageBodyInput'], 0, $queryParameters['chat_id']);
         }
     ?>
     <?php if($isPublicChat) {?>
