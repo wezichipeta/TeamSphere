@@ -40,7 +40,7 @@
                     <a class="nav-link" aria-current="page" href="./engagement.php">Engagement</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="">Task Board</a>
+                    <a class="nav-link" aria-current="page" href="./tasks.php">Task Board</a>
                 </li>
                 <!-- New Community Button -->
                 <li class="nav-item">
