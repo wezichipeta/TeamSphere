@@ -42,6 +42,10 @@
                 <li class="nav-item">
                     <a class="nav-link" aria-current="page" href="./tasks.php">Task Board</a>
                 </li>
+                <!-- New Morale Button -->
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="./morale.php">Morale</a>
+                </li>
                 <!-- New Community Button -->
                 <li class="nav-item">
                     <a class="nav-link" aria-current="page" href="./community.php">Community</a>

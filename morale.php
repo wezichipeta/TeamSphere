@@ -1,3 +1,16 @@
+<?php
+require_once('header.php');
+
+// User authentication check
+if (!isset($_SESSION['user'])) {
+    header('Location: signin.php'); // Redirect to login page if not authenticated
+    exit();
+}
+
+$userId = $_SESSION['user']['user_id']; // Make sure 'user_id' exists in the session array
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,28 +21,28 @@
 </head>
 <body>
     <header>
-        <h1>Morale </h1>
+        <h2>Morale </h2>
     </header>
     
     <main>
         <section>
-            <h2>Birthday Celebrations</h2>
+            <h5>Birthday Celebrations</h5>
             <button onclick="location.href='birthday.php';">View Birthday Celebrations</button>
         </section>
         
         <section>
-            <h2>Competitions</h2>
+            <h5>Competitions</h5>
             <button onclick="location.href='competitions.php';">View Competitions</button>
         </section>
         
         <section>
-            <h2>Kudos Page</h2>
+            <h5>Kudos Page</h5>
             <button onclick="location.href='kudos.php';">View Kudos</button>
         </section>
     </main>
     
-    <footer>
-        <p>&copy; 2024 TeamSphere</p>
-    </footer>
-</body>
+    </body>
+
+<?php require_once('footer.php'); ?>
+
 </html>

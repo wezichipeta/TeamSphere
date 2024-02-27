@@ -58,6 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['leaveEvent'])) {
 
 ?>
 
+
 <style>
     .form-container {
         max-width: 500px; /* Adjust as necessary */
@@ -113,8 +114,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['leaveEvent'])) {
     th {
         background-color: #f2f2f2;
     }
-</style>
 
+.engagement-container {
+    display: flex;
+    justify-content: space-between; /* Adjust spacing as needed */
+    margin-top: 20px;
+}
+
+.engagement-section, .experience-section {
+    flex: 1;
+    margin: 10px; /* Add some space between the sections */
+}
+
+/* Adjustments for smaller screens */
+@media (max-width: 800px) {
+    .engagement-container {
+        flex-direction: column;
+    }
+}
+
+
+</style>
+<div class="engagement-section">
 <div class="form-container">
     <h3>Engagement</h3>
     <p>To Engage with Team Members, Please, Create or Join an Event</p>
@@ -199,6 +220,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['leaveEvent'])) {
             <tr><td colspan="5">You have not joined any events yet.</td></tr>
         <?php endif; ?>
     </table>
+    </div> <!-- Close engagement-section -->
     <!-- Display the success message here -->
     <?php if (!empty($message)): ?>
         <div class="alert alert-success" role="alert" style="margin-top: 20px;">
@@ -206,5 +228,57 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['leaveEvent'])) {
         </div>
     <?php endif; ?>
 </div>
+
+<?php
+  if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['shareExperience'])) {
+    // Get the shared experience from the POST request
+    $experience = $_POST['experience'];
+
+    try {
+        // Attempt to save the experience
+        save_experience($experience);
+        // Handle success, such as sending a confirmation message to the user
+    } catch (Exception $e) {
+        // Handle error, such as informing the user they need to be logged in
+        $error_message = $e->getMessage();
+        // Show error to user or log it
+    }
+}
+
+
+// Retrieve shared experiences from the database
+$sharedExperiences = get_shared_experiences(); // Function to get shared experiences
+
+?>
+
+<!-- Form to share experiences -->
+<div>
+    <div class="experience-section">
+
+    <h5>Share Your Experience</h5>
+    <form action="engagement.php" method="post">
+        <label for="experience">Your Experience:</label>
+        <textarea id="experience" name="experience" required placeholder="Share your experience"></textarea><br>
+        <input type="submit" name="shareExperience" value="Share">
+    </form>
+</div>
+
+<!-- Display shared experiences on the wall -->
+<div>
+    <h5>Shared Experiences</h5>
+    <?php if (!empty($sharedExperiences)): ?>
+        <ul>
+            </div> <!-- Close experience-section -->
+
+            <?php foreach ($sharedExperiences as $experience): ?>
+                <li><?= htmlspecialchars($experience['username']) ?>: <?= htmlspecialchars($experience['experience']) ?></li>
+            <?php endforeach; ?>
+        </ul>
+    <?php else: ?>
+        <p>No experiences shared yet.</p>
+    <?php endif; ?>
+</div>
+</div> <!-- Close engagement-container -->
+
 
 <?php require_once('footer.php'); ?>

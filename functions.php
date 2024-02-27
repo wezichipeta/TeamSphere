@@ -281,3 +281,32 @@ function authenticate_user($email, $password) {
 function is_user_logged_in() {
     return $_SESSION && array_key_exists('user', $_SESSION) && $_SESSION['user'];
 }
+
+
+// Function to save a shared experience to the database
+function save_experience($experience) {
+// Check if the user is logged in and get their fullname
+
+    if (is_user_logged_in()) {
+        $username = $_SESSION['user']['fullname']; // Get the fullname from session
+
+    $conn = get_db_connection();
+        $stmt = $conn->prepare("INSERT INTO shared_experiences (username, experience) VALUES (:username, :experience)");
+        $stmt->bindParam(':username', $username);
+        $stmt->bindParam(':experience', $experience);
+        $stmt->execute();
+        $conn = null;
+    } else {
+        // Handle the case when the user is not logged in
+        throw new Exception("User must be logged in to share an experience.");
+    }
+}
+// Function to get shared experiences from the database
+function get_shared_experiences() {
+    $conn = get_db_connection();
+    $stmt = $conn->query("SELECT * FROM shared_experiences ORDER BY id DESC");
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+?>
+
